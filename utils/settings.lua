@@ -7,6 +7,20 @@ weapon_data = {
 	["sai"] = { ["cooldown"] = 80, ["damage"] = 10, ["graphic"] = "res/gfx/weapons/sai/" },
 }
 
+-- magic
+magic_data = {
+	["flame"] = { ["strength"] = 5, ["cost"] = 20, ["graphic"] = "res/gfx/particles/flame/fire.png" },
+	["heal"] = { ["strength"] = 20, ["cost"] = 10, ["graphic"] = "res/gfx/particles/heal/heal.png" },
+}
+
+-- enemy
+monster_data = {
+	["squid"] = { ["health"] = 100, ["exp"] = 100, ["damage"] = 20, ["attack_type"] = "slash", ["attack_sound"] = "res/sfx/attack/slash.waw", ["speed"] = 3, ["resistance"] = 3, ["attack_radius"] = 80, ["notice_radius"] = 360 },
+	["raccoon"] = { ["health"] = 300, ["exp"] = 250, ["damage"] = 20, ["attack_type"] = "claw", ["attack_sound"] = "res/sfx/attack/claw.waw", ["speed"] = 2, ["resistance"] = 3, ["attack_radius"] = 120, ["notice_radius"] = 400 },
+	["spirit"] = { ["health"] = 100, ["exp"] = 110, ["damage"] = 20, ["attack_type"] = "thunder", ["attack_sound"] = "res/sfx/attack/fireball.waw", ["speed"] = 4, ["resistance"] = 3, ["attack_radius"] = 60, ["notice_radius"] = 350 },
+	["bamboo"] = { ["health"] = 70, ["exp"] = 120, ["damage"] = 20, ["attack_type"] = "leaf_attack", ["attack_sound"] = "res/sfx/attack/slash.waw", ["speed"] = 3, ["resistance"] = 3, ["attack_radius"] = 50, ["notice_radius"] = 300 },
+}
+
 -- UI
 ui_data = {
 	bar_height = 20,
@@ -25,5 +39,5 @@ ui_data = {
 	-- ui colors
 	health_color = "red",
 	energy_color = "blue",
-	border_color_active = "gold",
+	border_color_active = { 1, 0.84, 0 },
 }

@@ -31,7 +31,7 @@ function Weapon:destroy()
 end
 
 function Weapon:render(player)
-	self.name = player.current_weapon
+	self.name = player.weapons[player.current_weapon_idx]
 	local direction = player.direction
 	local px, py = player.physics:getPosition()
 	local p_width, p_height = player.animation:get_size()

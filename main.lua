@@ -37,10 +37,10 @@ end
 function love.draw()
 	cam:attach()
 		Level:render()
+		GameObjectInstance:draw()
 		-- world:draw()
 	cam:detach()
 
-	GameObjectInstance:draw()
 	ui:render()
 end
 
@@ -51,7 +51,6 @@ function love.graphics.center(sprite, rect)
 	
 	return px, py
 end
-
 
 function love.keypressed(key)
 	if key == "escape" then love.event.quit() end

@@ -2,6 +2,7 @@ local class = require "lib.middleclass"
 
 local Animation = require "utils.animation"
 local Weapon = require "weapon"
+local Magic = require "magic"
 
 local player_anim = require "res.animation.player"
 
@@ -16,10 +17,17 @@ function Player:initialize()
 	
 	-- weapons
 	self.weapons = { "sword", "lance", "axe", "rapier", "sai" }
-	self.current_weapon = "sword"
-	self.current_weapon_idx = 1
-	self.q_press = false
 	self.weapon = Weapon:new()
+	self.current_weapon_idx = 1
+	self.can_switch_weapon = false
+	self.weapon_switch_time = love.timer.getTime()
+	
+	-- magic
+	self.magic_list = { "flame", "heal" }
+	self.magic = Magic:new()
+	self.magic_index = 1
+	self.can_switch_magic = true
+	self.magic_switch_time = love.timer.getTime()
  
 	-- collider (make it a rigid body)
 	self.physics = world:newCircleCollider(self.initial_pos.x, self.initial_pos.y, 30)
@@ -70,12 +78,12 @@ Player.static.behaviour = {
 		-- attacking
 		if love.keyboard.isDown("space") then
 			self.state = "attacking"
+			self.weapon:spawn()
 		end
 	end,
 	
 	["attacking"] = function(self, dt)
 		self.animation:play("attack_"..self.direction)
-		self.weapon:spawn()
 		self.attack_time = self.attack_time - (100 * dt)
 		
 		if (self.attack_time < 0) then
@@ -95,23 +103,33 @@ function Player:update(dt)
 	-- camera
 	cam:lookAt(self.physics:getPosition())
 	
-	if self.state ~= "attacking" and love.keyboard.isDown("q") and not self.q_press then
+	-- change weapon
+	if self.state ~= "attacking" and love.keyboard.isDown("q") and love.timer.getTime() > (self.weapon_switch_time + 0.5) then
 		self.current_weapon_idx = self.current_weapon_idx + 1
 		if self.current_weapon_idx > #self.weapons then self.current_weapon_idx = 1 end
-		self.current_weapon = self.weapons[self.current_weapon_idx]
-		self.q_press = true
-	elseif love.keyboard.isDown("q") and self.q_press then
-		self.q_press = false
+		self.can_switch_weapon = true
+		self.weapon_switch_time = love.timer.getTime()
+	elseif not love.keyboard.isDown("q") then
+		self.can_switch_weapon = false
+	end
+	
+	-- change magic
+	if self.state ~= "attacking" and love.keyboard.isDown("e") and love.timer.getTime() > (self.magic_switch_time + 0.5) then
+		self.magic_index = self.magic_index + 1
+		if self.magic_index > #self.magic_list then self.magic_index = 1 end
+		self.can_switch_magic = true
+		self.magic_switch_time = love.timer.getTime()
+	elseif not love.keyboard.isDown("e") then
+		self.can_switch_magic = false
 	end
 	
 	self.animation:update(dt)
 end
 
 function Player:draw()
-	cam:attach()
-		self.animation:render(self.physics:getPosition())
-		self.weapon:render(self)
-	cam:detach()
+	local px, py = self.physics:getPosition()
+	self.animation:render(px, py, false, "center")
+	self.weapon:render(self)
 end
 
 -- add "Player" as a game object

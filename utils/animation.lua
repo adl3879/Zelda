@@ -29,7 +29,7 @@ function Animation:play(name)
 	self.current_state = self.animation_states[name]
 end
 
-function Animation:render(x, y, flip)
+function Animation:render(x, y, flip, center)
 	local current_sprite = self.current_state.sprite
 
 	if self.type == "sequence" then
@@ -45,8 +45,10 @@ function Animation:render(x, y, flip)
 
 		if flip then
 			love.graphics.draw(self.current_state.sprites[sprite_num], x, y, 0, self.current_state.size[3], -self.current_state.size[4], self.current_state.size[1], 0)
-		else
+		elseif center == "center" then
 			love.graphics.draw(self.current_state.sprites[sprite_num], x, y, 0, self.current_state.size[3], self.current_state.size[4], self.current_state.size[1] / 2, self.current_state.size[2] / 2)
+		else
+			love.graphics.draw(self.current_state.sprites[sprite_num], x, y)
 		end
 	end
 end

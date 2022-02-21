@@ -1,5 +1,6 @@
 local class = require "lib.middleclass"
 local Weapon = require "weapon"
+local Magic = require "magic"
 require "utils.settings"
 
 local UI = class("UI")
@@ -62,11 +63,15 @@ function UI:show_exp(exp)
 	love.graphics.setColor(1, 1, 1)
 end
 
-function UI:selection_box(left, top)
+function UI:selection_box(left, top, has_switched)
 	love.graphics.setColor(ui_data.bg_color)
 	love.graphics.rectangle("fill", left, top, ui_data.item_box_size, ui_data.item_box_size)
 	
-	love.graphics.setColor(ui_data.border_color)
+	if has_switched then
+		love.graphics.setColor(ui_data.border_color_active)
+	else
+		love.graphics.setColor(ui_data.border_color)
+	end
 	love.graphics.rectangle("line", left, top, ui_data.item_box_size, ui_data.item_box_size, 3)
 	
 	-- reset color
@@ -75,11 +80,17 @@ function UI:selection_box(left, top)
 end
 
 -- weapon overlay
-function UI:weapon_overlay(weapon)
+function UI:weapon_overlay(weapon, has_switched)
 	local sprite = Weapon.SPRITES[weapon]["full"]
-	local rect = self:selection_box(10, 610)
+	local rect = self:selection_box(10, 610, has_switched)
 	
 	-- draw weapon on overlay
+	love.graphics.draw(sprite, love.graphics.center(sprite, rect))
+end
+
+function UI:magic_overlay(magic, has_switched)
+	local sprite = Magic.SPRITES[magic]
+	local rect = self:selection_box(80, 615, has_switched) -- magic
 	love.graphics.draw(sprite, love.graphics.center(sprite, rect))
 end
 
@@ -91,8 +102,8 @@ function UI:render()
 	-- experience
 	self:show_exp(player.exp)
 	-- selection box
-	self:weapon_overlay(player.current_weapon)
-	self:selection_box(80, 615) -- magic
+	self:weapon_overlay(player.weapons[player.current_weapon_idx], player.can_switch_weapon)
+	self:magic_overlay(player.magic_list[player.magic_index], player.can_switch_magic)
 end
 
 return UI
