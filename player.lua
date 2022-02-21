@@ -127,9 +127,13 @@ function Player:update(dt)
 end
 
 function Player:draw()
-	local px, py = self.physics:getPosition()
+	local px, py = self:get_position()
 	self.animation:render(px, py, false, "center")
 	self.weapon:render(self)
+end
+
+function Player:get_position()
+	return self.physics:getPosition()
 end
 
 -- add "Player" as a game object
