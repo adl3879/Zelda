@@ -34,4 +34,3 @@ end
 local GameObjectInstance = GameObject:new()
 
 return GameObjectInstance
- 

@@ -15,10 +15,10 @@ magic_data = {
 
 -- enemy
 monster_data = {
-	["squid"] = { ["health"] = 100, ["exp"] = 100, ["damage"] = 20, ["attack_type"] = "slash", ["attack_sound"] = "res/sfx/attack/slash.waw", ["speed"] = 3, ["resistance"] = 3, ["attack_radius"] = 80, ["notice_radius"] = 360 },
-	["raccoon"] = { ["health"] = 300, ["exp"] = 250, ["damage"] = 20, ["attack_type"] = "claw", ["attack_sound"] = "res/sfx/attack/claw.waw", ["speed"] = 2, ["resistance"] = 3, ["attack_radius"] = 120, ["notice_radius"] = 400 },
-	["spirit"] = { ["health"] = 100, ["exp"] = 110, ["damage"] = 20, ["attack_type"] = "thunder", ["attack_sound"] = "res/sfx/attack/fireball.waw", ["speed"] = 4, ["resistance"] = 3, ["attack_radius"] = 60, ["notice_radius"] = 350 },
-	["bamboo"] = { ["health"] = 70, ["exp"] = 120, ["damage"] = 20, ["attack_type"] = "leaf_attack", ["attack_sound"] = "res/sfx/attack/slash.waw", ["speed"] = 3, ["resistance"] = 3, ["attack_radius"] = 50, ["notice_radius"] = 300 },
+	["squid"] = { ["health"] = 100, ["exp"] = 100, ["damage"] = 20, ["attack_type"] = "slash", ["attack_sound"] = "res/sfx/attack/slash.waw", ["speed"] = 30, ["resistance"] = 3, ["attack_radius"] = 80, ["notice_radius"] = 260 },
+	["raccoon"] = { ["health"] = 300, ["exp"] = 250, ["damage"] = 20, ["attack_type"] = "claw", ["attack_sound"] = "res/sfx/attack/claw.waw", ["speed"] = 20, ["resistance"] = 3, ["attack_radius"] = 120, ["notice_radius"] = 300 },
+	["spirit"] = { ["health"] = 100, ["exp"] = 110, ["damage"] = 20, ["attack_type"] = "thunder", ["attack_sound"] = "res/sfx/attack/fireball.waw", ["speed"] = 40, ["resistance"] = 3, ["attack_radius"] = 60, ["notice_radius"] = 250 },
+	["bamboo"] = { ["health"] = 70, ["exp"] = 120, ["damage"] = 20, ["attack_type"] = "leaf_attack", ["attack_sound"] = "res/sfx/attack/slash.waw", ["speed"] = 30, ["resistance"] = 3, ["attack_radius"] = 50, ["notice_radius"] = 200 },
 }
 
 -- UI

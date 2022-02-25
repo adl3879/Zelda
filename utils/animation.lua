@@ -2,11 +2,11 @@ local class = require "lib.middleclass"
 
 local Animation = class("Animation")
 
-function Animation:initialize(data, type)
+function Animation:initialize(data, mode)
 	self.current_time = 0
 	self.animation_states = data
 	self.current_state = {}
-	self.type = type or "sequence"
+	self.type = mode or "sequence"
 
 	for key, value in ipairs(self.animation_states) do
 		if self.type == "sequence" then

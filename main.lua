@@ -14,11 +14,11 @@ function love.load()
 	ui = UI:new()
 
 	GameObjectInstance = require "object"
+	require "player"
 	Level = require "level"
 	Camera = require "lib.camera"
 	cam = Camera()
 	sti = require "lib.sti"
-	require "player"
 
 	Level:new()
 end
