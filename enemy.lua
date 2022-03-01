@@ -2,6 +2,7 @@ local class = require "lib.middleclass"
 local Animation = require "utils.animation"
 local enemy_anim = require "res.animation.enemy"
 local Vector2 = require "physics.vector2"
+local Collider = require "physics.collider"
 require "utils.settings"
 
 local Enemy = class("Enemy")
@@ -33,6 +34,11 @@ function Enemy:initialize(name, id, x, y, width, height)
 	
 	-- animation
 	self.animation = Animation:new(enemy_anim, "sprite")
+	
+	-- collider
+	local offset = { x = 4, y = 4 } 
+	colliders[self.id] = Collider:new("attackable")
+	colliders[self.id]:new_box_collider(self.position.x, self.position.y, self.size.w - offset.x, self.size.h - offset.y)
 end
 
 -- define behaviours
@@ -67,6 +73,16 @@ function Enemy:update(dt)
 	Enemy.behaviour[self.state](self, dt)
 	self.animation:update(dt)
 	self:update_state()
+	colliders[self.id]:set_box_collider(self.position.x, self.position.y)
+	
+	if colliders[self.id]:enter("attacker") then
+		self.state = "take_hit"
+	end
+	
+	if colliders[self.id]:enter("player") then
+		local player = GameObjectInstance:get("player")
+		-- player.is_collided = true
+	end
 end
 
 function Enemy:draw()
@@ -92,13 +108,8 @@ function Enemy:update_state()
 	self.player_distance, self.player_direction = self:get_player_distance_direction()
 	local player = GameObjectInstance:get("player") -- player instance 
 	
-	if self.player_distance <= self.attack_radius and love.timer.getTime() > (self.attack_time + 0.001) then 
-		if player.state == "attacking" then
-			self.state = "take_hit"
-		else
-			self.state = "attack"
-			self.attack_time = love.timer.getTime()
-		end
+	if self.player_distance <= self.attack_radius then 
+		self.state = "attack"
 	elseif self.player_distance <= self.notice_radius then
 		self.state = "move"
 	else

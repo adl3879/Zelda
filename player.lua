@@ -3,6 +3,7 @@ local class = require "lib.middleclass"
 local Animation = require "utils.animation"
 local Weapon = require "weapon"
 local Magic = require "magic"
+local Collider = require "physics.collider"
 
 local player_anim = require "res.animation.player"
 
@@ -10,7 +11,8 @@ local Player = class("Player")
 
 function Player:initialize()
 	self.animation = Animation:new(player_anim, "sprite")
-	self.initial_pos = { x = 1980, y = 1300 }
+	self.position = { x = 1980, y = 1300 }
+	self.last_safe_pos = { x = 0, y = 0 }
 	self.state = "idle"
 	self.direction = "down"
 	self.attack_time = Player.ATTACK_TIME
@@ -30,7 +32,10 @@ function Player:initialize()
 	self.magic_switch_time = love.timer.getTime()
  
 	-- collider (make it a rigid body)
-	self.physics = world:newCircleCollider(self.initial_pos.x, self.initial_pos.y, 30)
+	self.physics = world:newCircleCollider(self.position.x, self.position.y, 30)
+	colliders["player"] = Collider:new("player")
+	colliders["player"]:new_box_collider(self.position.x, self.position.y, 60, 60)
+	self.is_collided = false
 	
 	-- stats
 	self.stats = { health = 100, energy = 60, attack = 10, magic = 4, speed = 6 }
@@ -103,6 +108,18 @@ function Player:update(dt)
 	-- camera
 	cam:lookAt(self.physics:getPosition())
 	
+	-- collider
+	self.position.x, self.position.y = self:get_position()
+	colliders["player"]:set_box_collider(self.position.x, self.position.y, 60, 60)
+	if self.is_collided then
+		self.position.x = self.last_safe_pos.x
+		self.position.y = self.last_safe_pos.y
+	else
+		self.last_safe_pos.x = self.position.x
+		self.last_safe_pos.y = self.position.y
+	end
+	self.is_collided = false
+	
 	-- change weapon
 	if self.state ~= "attacking" and love.keyboard.isDown("q") and love.timer.getTime() > (self.weapon_switch_time + 0.5) then
 		self.current_weapon_idx = self.current_weapon_idx + 1
@@ -124,11 +141,11 @@ function Player:update(dt)
 	end
 	
 	self.animation:update(dt)
+	self.weapon:update(self, dt)
 end
 
 function Player:draw()
-	local px, py = self:get_position()
-	self.animation:render(px, py, false, "center")
+	self.animation:render(self.position.x, self.position.y, false, "center")
 	self.weapon:render(self)
 end
 

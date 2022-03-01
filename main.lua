@@ -8,6 +8,7 @@ function love.load()
 	-- windfield
 	local wf = require "lib.windfield"
 	world = wf.newWorld()
+	world:addCollisionClass("attackable")
 	
 	-- ui
 	local UI = require "ui"
@@ -19,6 +20,9 @@ function love.load()
 	Camera = require "lib.camera"
 	cam = Camera()
 	sti = require "lib.sti"
+	
+	-- collider
+	require "physics.collider"
 
 	Level:new()
 end
@@ -39,6 +43,7 @@ function love.draw()
 		Level:render()
 		GameObjectInstance:draw()
 		-- world:draw()
+		-- for i, collider in pairs(colliders) do collider:draw() end
 	cam:detach()
 
 	ui:render()
