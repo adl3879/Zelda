@@ -1,4 +1,3 @@
-
 -- load default values for game
 function love.load()
 	print("zelda game starting.......")
@@ -20,6 +19,9 @@ function love.load()
 	Camera = require "lib.camera"
 	cam = Camera()
 	sti = require "lib.sti"
+
+	-- particle system
+	ParticleEffectInstance = require "particle"
 	
 	-- collider
 	require "physics.collider"
@@ -36,12 +38,15 @@ function love.update(dt)
 	-- camera
 	if cam.x < window_width / 2 then cam.x = window_width / 2 end
 	if cam.y < window_height / 2 then cam.y = window_height / 2 end
+
+	ParticleEffectInstance:update(dt)
 end
 
 function love.draw()
 	cam:attach()
 		Level:render()
 		GameObjectInstance:draw()
+		ParticleEffectInstance:draw()
 		-- world:draw()
 		-- for i, collider in pairs(colliders) do collider:draw() end
 	cam:detach()
@@ -59,4 +64,26 @@ end
 
 function love.keypressed(key)
 	if key == "escape" then love.event.quit() end
+end
+
+-- wave value
+function wave_value()
+	local value = math.sin(love.timer.getTime() * 30 )
+	if value > 0 then return 1 else return 0 end
+end
+
+function import_folder(path)
+	local sprites = {}
+	local fs = love.filesystem
+	local files_table = fs.getDirectoryItems(path)
+	
+	for i, v in ipairs(files_table) do
+		local file = path.."/"..v
+		if fs.getInfo(file).type == "file" then
+			local image = love.graphics.newImage(file)
+			table.insert(sprites, image)
+		end
+	end
+
+	return sprites
 end

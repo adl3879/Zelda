@@ -13,7 +13,6 @@ end
 
 function Level:render()
 	self.map:drawLayer(self.map.layers["bkg"])
-	--self.map:drawLayer(self.map.layers["grass"])
 	self.map:drawLayer(self.map.layers["vegetation"])
 end
 
@@ -30,9 +29,14 @@ end
 function Level:create_map()
 	-- grass
 	if self.map.layers["grass"] then
-		spawn_attackable_objects("grass", "grass_1", function (_, id, pos, size)
+		spawn_attackable_objects("grass", "grass_1", function(enemy_idx_check, id, pos, size)
 			local rect = { x = pos.x, y = pos.y, w = size.w, h = size.h }
-			GameObjectInstance:new(id, Grass:new(id, rect))
+			
+			local grass_type = ""
+			if enemy_idx_check(12383) then grass_type = "grass_1"
+			elseif enemy_idx_check(12384) then grass_type = "grass_2"
+			elseif enemy_idx_check(12385) then grass_type = "grass_3" end
+			GameObjectInstance:new("vegetation", id, Grass:new(id, rect, grass_type))
 		end)
 	end
 
@@ -45,14 +49,14 @@ function Level:create_map()
 	
 	-- spawn enemies
 	if self.map.layers["entities"] then
-		spawn_attackable_objects("entities", "Floor", function (enemy_idx_check, id, pos, size)
+		spawn_attackable_objects("entities", "Floor", function(enemy_idx_check, id, pos, size)
 			-- create enemy objects
 			local monster_name = ""
 			if enemy_idx_check(390) then monster_name = "bamboo"
 			elseif enemy_idx_check(391) then monster_name = "spirit"
 			elseif enemy_idx_check(392) then monster_name = "racoon"
 			elseif enemy_idx_check(393) then monster_name = "squid" end
-			GameObjectInstance:new(id, Enemy:new(monster_name, id, pos.x, pos.y, size.w, size.h))
+			GameObjectInstance:new("enemies", id, Enemy:new(monster_name, id, pos.x, pos.y, size.w, size.h))
 		end)
 	end
 end
@@ -65,10 +69,7 @@ function spawn_platform(x, y, width, height)
 end
 
 function spawn_attackable_objects(layer_name, sprite_name, fn)
-	local firstgid = 0
-	local tilesize = {}
-	local data = {}
-	local size = {}
+	local firstgid, tilesize, data, size
 	
 	for key, value in pairs(map_data.tilesets) do
 		if value.name == sprite_name then
@@ -92,8 +93,12 @@ function spawn_attackable_objects(layer_name, sprite_name, fn)
 			local index = (x + y * size.w) + 1
 			
 			if data[index] ~= 0 then
-				local enemy_idx_check = function(col) 
-					return data[index] == firstgid + col
+				local enemy_idx_check = function(col)
+					if layer_name == "grass" then
+						return data[index] == col
+					else
+						return data[index] == firstgid + col
+					end
 				end
 				
 				local px = (x / 2) * tilesize.w

@@ -95,7 +95,7 @@ function UI:magic_overlay(magic, has_switched)
 end
 
 function UI:render()
-	local player = GameObjectInstance:get("player")
+	local player = GameObjectInstance:get_player()
 	-- bar
 	self:show_bar(player.health, player.stats.health, self.health_bar_rect, { 1, 0, 0 })
 	self:show_bar(player.energy, player.stats.energy, self.energy_bar_rect, { 0, 0, 1 })

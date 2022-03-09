@@ -13,20 +13,21 @@ function Enemy:initialize(name, id, x, y, width, height)
 	self.name = name
 	self.position = { x = x, y = y }
 	self.size = { w = width, h = height }
-	self.state = "attack"
+	self.state = "idle"
 	self.id = id
 	
 	self.player_distance = 0
 	self.player_direcion = 0
 	self.can_attack = true
 	self.attack_time = love.timer.getTime()
+	self.alpha = 1 
 	
 	-- stats
 	local monster_info = monster_data[self.name]
 	self.health = monster_info.health
 	self.exp = monster_info.exp
 	self.speed = monster_info.speed
-	self.attack_damage = monster_info.attack_damage
+	self.attack_damage = monster_info.damage
 	self.resistance = monster_info.resistance
 	self.attack_radius = monster_info.attack_radius
 	self.notice_radius = monster_info.notice_radius
@@ -38,6 +39,9 @@ function Enemy:initialize(name, id, x, y, width, height)
 	-- collider
 	local offset = { x = 4, y = 4 } 
 	colliders[self.id] = Collider:new("attackable")
+	if self.name == "racoon" then
+		self.size = { w = 240, h = 240 }
+	end
 	colliders[self.id]:new_box_collider(self.position.x, self.position.y, self.size.w - offset.x, self.size.h - offset.y)
 end
 
@@ -56,45 +60,64 @@ Enemy.static.behaviour = {
 	end,
 	
 	["attack"] = function(self, dt)
+		local player = GameObjectInstance:get_player() -- player instance
 		self.animation:play(self.name.."_attack")
-		-- print("attacking")
+		player:take_damage(self.attack_damage, self.attack_type)
 	end,
 	
 	["take_hit"] = function(self, dt)
-		local player = GameObjectInstance:get("player") -- player instance
+		local player = GameObjectInstance:get_player() -- player instance
 		
 		self.animation:play(self.name.."_idle")
-		self.health = self.health - (player.stats.attack * dt + math.inverse(self.resistance))
-		if self.health <= 0 then self:destroy() end
+
+		self.health = self.health - (player.stats.attack * math.inverse(self.resistance))
+		self.alpha = wave_value()
+	end,
+
+	["dead"] = function(self, dt)
+		self:destroy()
+		ParticleEffectInstance:create(self.name, self.position.x - 32, self.position.y - 32)
 	end
 }
 
 function Enemy:update(dt)
+	local player = GameObjectInstance:get_player()
 	Enemy.behaviour[self.state](self, dt)
 	self.animation:update(dt)
 	self:update_state()
-	colliders[self.id]:set_box_collider(self.position.x, self.position.y)
-	
+	local px, py
+	if self.name == "racoon" then
+		 px = self.position.x + 120
+		 py = self.position.y + 120
+	 else
+		 px = self.position.x
+		 py = self.position.y
+	end
+	colliders[self.id]:set_box_collider(px, py)
+
 	if colliders[self.id]:enter("attacker") then
 		self.state = "take_hit"
 	end
 	
 	if colliders[self.id]:enter("player") then
-		local player = GameObjectInstance:get("player")
 		-- player.is_collided = true
 	end
+	
+	if self.state ~= "take_hit" then self.alpha = 1 end
 end
 
 function Enemy:draw()
+	love.graphics.setColor(1, 1, 1, self.alpha)
 	self.animation:render(self.position.x, self.position.y, false, "center")
+	love.graphics.setColor(1, 1, 1)
 end
 
 function Enemy:destroy()
-	GameObjectInstance:destroy(self.id)
+	GameObjectInstance:destroy("enemies", self.id)
 end
 
 function Enemy:get_player_distance_direction()
-	local player = GameObjectInstance:get("player") -- player instance
+	local player = GameObjectInstance:get_player() -- player instance
 	
 	local player_vec = Vector2(player:get_position())
 	local enemy_vec = Vector2(self.position.x, self.position.y)
@@ -106,7 +129,7 @@ end
 
 function Enemy:update_state()
 	self.player_distance, self.player_direction = self:get_player_distance_direction()
-	local player = GameObjectInstance:get("player") -- player instance 
+	local player = GameObjectInstance:get_player() -- player instance 
 	
 	if self.player_distance <= self.attack_radius then 
 		self.state = "attack"
@@ -115,6 +138,8 @@ function Enemy:update_state()
 	else
 		self.state = "idle"
 	end
+
+	if self.health < 0 then self.state = "dead" end
 end
 
 return Enemy
